@@ -9,6 +9,7 @@ import type {
   LinkEntry,
   FollowerEntry,
   FollowingEntry,
+  SocialAnalysis,
 } from '@/types';
 
 export const useIGStore = create<IGStore>((set) => ({
@@ -23,6 +24,7 @@ export const useIGStore = create<IGStore>((set) => ({
   linkHistory: [],
   followers: [],
   following: [],
+  socialAnalysis: null,
 
   // ─────────────────────────────────────────────────────────
   // Actions - Profiling Module
@@ -63,7 +65,7 @@ export const useIGStore = create<IGStore>((set) => ({
     })),
 
   // ─────────────────────────────────────────────────────────
-  // Actions - Social Module (untuk nanti)
+  // Actions - Social Module
   // ─────────────────────────────────────────────────────────
 
   setFollowers: (data: FollowerEntry[]) =>
@@ -76,6 +78,12 @@ export const useIGStore = create<IGStore>((set) => ({
     set((state) => ({
       ...state,
       following: data,
+    })),
+
+  setSocialAnalysis: (data: SocialAnalysis) =>
+    set((state) => ({
+      ...state,
+      socialAnalysis: data,
     })),
 
   // ─────────────────────────────────────────────────────────
@@ -91,5 +99,6 @@ export const useIGStore = create<IGStore>((set) => ({
       linkHistory: [],
       followers: [],
       following: [],
+      socialAnalysis: null,
     }),
 }));

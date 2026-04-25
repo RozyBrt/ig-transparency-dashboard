@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { UploadZone } from "@/components/UploadZone";
 import { ProfilingModule } from "@/components/modules/ProfilingModule";
 import { FootprintModule } from "@/components/modules/FootprintModule";
+import { SocialModule } from "@/components/modules/SocialModule";
 import { useIGStore } from "@/lib/store";
 import { 
   LayoutDashboard, 
@@ -12,19 +13,21 @@ import {
   Trash2, 
   Settings,
   ShieldCheck,
-  Instagram
+  Instagram,
+  Users
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
 export default function DashboardPage() {
-  const [activeTab, setActiveTab] = useState<"upload" | "profiling" | "footprint">("upload");
+  const [activeTab, setActiveTab] = useState<"upload" | "profiling" | "footprint" | "social">("upload");
   const { reset } = useIGStore();
 
   const menuItems = [
     { id: "upload", label: "Upload Center", icon: LayoutDashboard },
     { id: "profiling", label: "Ads Profiling", icon: UserCircle },
     { id: "footprint", label: "Digital Footprint", icon: History },
+    { id: "social", label: "Social Analysis", icon: Users },
   ];
 
   return (
@@ -93,7 +96,7 @@ export default function DashboardPage() {
 
         <div className="p-8 max-w-5xl mx-auto">
           {activeTab === "upload" && (
-            <div className="space-y-8">
+            <div className="space-y-8 animate-in fade-in duration-500">
               <div className="space-y-2">
                 <h2 className="text-3xl font-bold tracking-tight">Upload Center</h2>
                 <p className="text-muted-foreground">Mulai dengan meng-upload file JSON hasil download data Instagram kamu.</p>
@@ -103,7 +106,7 @@ export default function DashboardPage() {
           )}
 
           {activeTab === "profiling" && (
-            <div className="space-y-8">
+            <div className="space-y-8 animate-in fade-in duration-500">
               <div className="space-y-2">
                 <h2 className="text-3xl font-bold tracking-tight">Ads & Topics Profiling</h2>
                 <p className="text-muted-foreground">Bagaimana Meta melihat preferensi dan minat kamu untuk pengiklan.</p>
@@ -113,12 +116,22 @@ export default function DashboardPage() {
           )}
 
           {activeTab === "footprint" && (
-            <div className="space-y-8">
+            <div className="space-y-8 animate-in fade-in duration-500">
               <div className="space-y-2">
                 <h2 className="text-3xl font-bold tracking-tight">Digital Footprint</h2>
                 <p className="text-muted-foreground">Jejak aktivitas login dan riwayat link yang pernah kamu kunjungi.</p>
               </div>
               <FootprintModule />
+            </div>
+          )}
+
+          {activeTab === "social" && (
+            <div className="space-y-8 animate-in fade-in duration-500">
+              <div className="space-y-2">
+                <h2 className="text-3xl font-bold tracking-tight">Social Analysis</h2>
+                <p className="text-muted-foreground">Analisis followers, following, dan deteksi akun mencurigakan.</p>
+              </div>
+              <SocialModule />
             </div>
           )}
         </div>

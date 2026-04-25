@@ -44,7 +44,7 @@ export interface LinkEntry {
 }
 
 // ═══════════════════════════════════════════════════════════
-// SOCIAL MODULE (Followers/Following) - untuk ekspansi nanti
+// SOCIAL MODULE (Followers/Following Analysis)
 // ═══════════════════════════════════════════════════════════
 
 export interface FollowerEntry {
@@ -59,8 +59,18 @@ export interface FollowingEntry {
   timestamp: number;
   date: Date;
   href: string;
-  followsBack: boolean;   // Apakah dia follow balik
-  suspicious: boolean;    // Apakah username mencurigakan (banyak angka, dll)
+  followsBack: boolean;      // Apakah dia follow balik
+  suspicious: boolean;        // Username mencurigakan (bot indicator)
+}
+
+// Hasil analisis mutual relationships
+export interface SocialAnalysis {
+  followers: FollowerEntry[];
+  following: FollowingEntry[];
+  mutuals: string[];           // Username yang saling follow
+  notFollowBack: string[];     // Kamu follow tapi dia nggak follow balik
+  notFollowingBack: string[];  // Dia follow tapi kamu nggak follow balik
+  suspiciousFollowing: FollowingEntry[]; // Following dengan username mencurigakan
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -77,9 +87,10 @@ export interface IGStore {
   loginActivity: LoginEntry[];
   linkHistory: LinkEntry[];
   
-  // Social (untuk nanti)
+  // Social Module
   followers: FollowerEntry[];
   following: FollowingEntry[];
+  socialAnalysis: SocialAnalysis | null;
   
   // Actions
   setCategories: (data: MetaCategory[]) => void;
@@ -89,6 +100,7 @@ export interface IGStore {
   setLinkHistory: (data: LinkEntry[]) => void;
   setFollowers: (data: FollowerEntry[]) => void;
   setFollowing: (data: FollowingEntry[]) => void;
+  setSocialAnalysis: (data: SocialAnalysis) => void;
   
   // Reset all
   reset: () => void;

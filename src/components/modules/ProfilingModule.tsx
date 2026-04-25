@@ -13,7 +13,8 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
-import { Target, List, Megaphone, Search, Filter } from "lucide-react";
+import { Target, List, Megaphone, Search, AlertCircle, FileJson } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export function ProfilingModule() {
   const { categories, topics, advertisers } = useIGStore();
@@ -32,41 +33,81 @@ export function ProfilingModule() {
     <div className="space-y-8 animate-in fade-in duration-500 pb-10">
       {/* Summary Cards */}
       <div className="grid gap-4 md:grid-cols-3">
-        <Card className="bg-primary/5 border-primary/20 shadow-sm">
+        {/* Card Kategori */}
+        <Card className={cn(
+          "transition-all duration-300",
+          categories.length === 0 ? "bg-muted/20 border-dashed" : "bg-primary/5 border-primary/20 shadow-sm"
+        )}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-primary">Kategori Profiling</CardTitle>
-            <Target className="h-4 w-4 text-primary" />
+            <CardTitle className="text-sm font-medium">Kategori Profiling</CardTitle>
+            <Target className={cn("h-4 w-4", categories.length > 0 ? "text-primary" : "text-muted-foreground")} />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">{categories.length}</div>
-            <p className="text-xs text-muted-foreground mt-1">Label minat dari Meta</p>
+            {categories.length > 0 ? (
+              <>
+                <div className="text-3xl font-bold">{categories.length}</div>
+                <p className="text-xs text-muted-foreground mt-1">Label minat dari Meta</p>
+              </>
+            ) : (
+              <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
+                <FileJson className="w-3 h-3" />
+                <span>Butuh <b>ads_interests.json</b></span>
+              </div>
+            )}
           </CardContent>
         </Card>
 
-        <Card className="bg-blue-500/5 border-blue-500/20 shadow-sm">
+        {/* Card Topik */}
+        <Card className={cn(
+          "transition-all duration-300",
+          topics.length === 0 ? "bg-muted/20 border-dashed" : "bg-blue-500/5 border-blue-500/20 shadow-sm"
+        )}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-blue-600">Topik Utama</CardTitle>
-            <List className="h-4 w-4 text-blue-500" />
+            <CardTitle className="text-sm font-medium">Topik Utama</CardTitle>
+            <List className={cn("h-4 w-4", topics.length > 0 ? "text-blue-500" : "text-muted-foreground")} />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">{topics.length}</div>
-            <p className="text-xs text-muted-foreground mt-1">Topik konten yang relevan</p>
+            {topics.length > 0 ? (
+              <>
+                <div className="text-3xl font-bold">{topics.length}</div>
+                <p className="text-xs text-muted-foreground mt-1">Topik konten yang relevan</p>
+              </>
+            ) : (
+              <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
+                <AlertCircle className="w-3 h-3 text-amber-500" />
+                <span>Upload <b>your_topics.json</b></span>
+              </div>
+            )}
           </CardContent>
         </Card>
 
-        <Card className="bg-purple-500/5 border-purple-500/20 shadow-sm">
+        {/* Card Pengiklan */}
+        <Card className={cn(
+          "transition-all duration-300",
+          advertisers.length === 0 ? "bg-muted/20 border-dashed" : "bg-purple-500/5 border-purple-500/20 shadow-sm"
+        )}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-purple-600">Pengiklan</CardTitle>
-            <Megaphone className="h-4 w-4 text-purple-500" />
+            <CardTitle className="text-sm font-medium">Pengiklan</CardTitle>
+            <Megaphone className={cn("h-4 w-4", advertisers.length > 0 ? "text-purple-500" : "text-muted-foreground")} />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">{advertisers.length}</div>
-            <p className="text-xs text-muted-foreground mt-1">Brand yang menargetkan kamu</p>
+            {advertisers.length > 0 ? (
+              <>
+                <div className="text-3xl font-bold">{advertisers.length}</div>
+                <p className="text-xs text-muted-foreground mt-1">Brand yang menargetkan kamu</p>
+              </>
+            ) : (
+              <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
+                <FileJson className="w-3 h-3" />
+                <span>Butuh file <b>advertisers_*.json</b></span>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
 
-      {advertisers.length > 0 && (
+      {/* Daftar Pengiklan Section */}
+      {advertisers.length > 0 ? (
         <Card className="border-none shadow-lg bg-background/50 backdrop-blur-sm ring-1 ring-muted">
           <CardHeader className="border-b px-6 py-4">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -126,20 +167,13 @@ export function ProfilingModule() {
             </div>
           </CardContent>
         </Card>
-      )}
-
-      {categories.length === 0 && topics.length === 0 && advertisers.length === 0 && (
-        <Card className="border-dashed border-2">
-          <CardContent className="flex flex-col items-center justify-center py-20 text-center space-y-4">
-             <div className="p-4 rounded-full bg-muted">
-                <Megaphone className="w-8 h-8 text-muted-foreground" />
-             </div>
-             <div className="space-y-1">
-                <p className="font-semibold">Belum ada data profiling</p>
-                <p className="text-sm text-muted-foreground max-w-sm">
-                  Silakan upload file <b>your_topics.json</b> atau <b>advertisers_*.json</b> untuk melihat analisisnya.
-                </p>
-             </div>
+      ) : (
+        <Card className="border-dashed border-2 py-12">
+          <CardContent className="flex flex-col items-center justify-center text-center space-y-4">
+             <Megaphone className="w-10 h-10 text-muted-foreground opacity-20" />
+             <p className="text-sm text-muted-foreground max-w-sm">
+               Daftar pengiklan akan muncul di sini setelah kamu meng-upload file <b>advertisers_*.json</b> dari folder ads_information.
+             </p>
           </CardContent>
         </Card>
       )}
