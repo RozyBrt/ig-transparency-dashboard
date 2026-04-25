@@ -1,101 +1,128 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import React, { useState } from "react";
+import { UploadZone } from "@/components/UploadZone";
+import { ProfilingModule } from "@/components/modules/ProfilingModule";
+import { FootprintModule } from "@/components/modules/FootprintModule";
+import { useIGStore } from "@/lib/store";
+import { 
+  LayoutDashboard, 
+  UserCircle, 
+  History, 
+  Trash2, 
+  Settings,
+  ShieldCheck,
+  Instagram
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+
+export default function DashboardPage() {
+  const [activeTab, setActiveTab] = useState<"upload" | "profiling" | "footprint">("upload");
+  const { reset } = useIGStore();
+
+  const menuItems = [
+    { id: "upload", label: "Upload Center", icon: LayoutDashboard },
+    { id: "profiling", label: "Ads Profiling", icon: UserCircle },
+    { id: "footprint", label: "Digital Footprint", icon: History },
+  ];
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <div className="flex min-h-screen bg-background">
+      {/* Sidebar */}
+      <aside className="hidden md:flex w-64 flex-col border-r bg-muted/30">
+        <div className="p-6 flex items-center gap-3">
+          <div className="p-2 rounded-xl bg-gradient-to-tr from-purple-500 via-pink-500 to-orange-500 text-white shadow-lg shadow-purple-500/20">
+            <Instagram className="w-6 h-6" />
+          </div>
+          <div>
+            <h1 className="font-bold tracking-tight">IG Analyzer</h1>
+            <p className="text-[10px] text-muted-foreground uppercase font-semibold">Data Transparency</p>
+          </div>
+        </div>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+        <nav className="flex-1 px-4 space-y-2 mt-4">
+          {menuItems.map((item) => {
+            const Icon = item.icon;
+            return (
+              <button
+                key={item.id}
+                onClick={() => setActiveTab(item.id as any)}
+                className={cn(
+                  "w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all",
+                  activeTab === item.id
+                    ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
+                    : "text-muted-foreground hover:bg-accent hover:text-foreground"
+                )}
+              >
+                <Icon className="w-4 h-4" />
+                {item.label}
+              </button>
+            );
+          })}
+        </nav>
+
+        <div className="p-4 mt-auto">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={reset}
+            className="w-full justify-start text-muted-foreground hover:text-destructive hover:bg-destructive/10"
           >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+            <Trash2 className="w-4 h-4 mr-2" />
+            Reset Session
+          </Button>
+        </div>
+      </aside>
+
+      {/* Main Content */}
+      <main className="flex-1 overflow-auto">
+        <header className="h-16 border-b flex items-center justify-between px-8 bg-background/50 backdrop-blur-md sticky top-0 z-10">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <ShieldCheck className="w-4 h-4 text-green-500" />
+            <span>Local Analysis Only</span>
+          </div>
+          
+          <div className="flex items-center gap-4">
+             <Button variant="ghost" size="icon">
+               <Settings className="w-4 h-4" />
+             </Button>
+             <div className="h-8 w-8 rounded-full bg-accent animate-pulse" />
+          </div>
+        </header>
+
+        <div className="p-8 max-w-5xl mx-auto">
+          {activeTab === "upload" && (
+            <div className="space-y-8">
+              <div className="space-y-2">
+                <h2 className="text-3xl font-bold tracking-tight">Upload Center</h2>
+                <p className="text-muted-foreground">Mulai dengan meng-upload file JSON hasil download data Instagram kamu.</p>
+              </div>
+              <UploadZone />
+            </div>
+          )}
+
+          {activeTab === "profiling" && (
+            <div className="space-y-8">
+              <div className="space-y-2">
+                <h2 className="text-3xl font-bold tracking-tight">Ads & Topics Profiling</h2>
+                <p className="text-muted-foreground">Bagaimana Meta melihat preferensi dan minat kamu untuk pengiklan.</p>
+              </div>
+              <ProfilingModule />
+            </div>
+          )}
+
+          {activeTab === "footprint" && (
+            <div className="space-y-8">
+              <div className="space-y-2">
+                <h2 className="text-3xl font-bold tracking-tight">Digital Footprint</h2>
+                <p className="text-muted-foreground">Jejak aktivitas login dan riwayat link yang pernah kamu kunjungi.</p>
+              </div>
+              <FootprintModule />
+            </div>
+          )}
         </div>
       </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
     </div>
   );
 }
