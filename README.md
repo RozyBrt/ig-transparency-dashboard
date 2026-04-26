@@ -1,36 +1,67 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 📸 IG Transparency Dashboard
 
-## Getting Started
+An interactive dashboard to analyze your Instagram data export. Understand how Meta profiles you, track your digital footprint, and audit your social relationships—all locally and privately.
 
-First, run the development server:
+![Local Analysis Only](https://img.shields.io/badge/Privacy-Local%20Only-green?style=for-the-badge)
+![Next.js](https://img.shields.io/badge/Next.js%2014-black?style=for-the-badge&logo=next.js)
+![TailwindCSS](https://img.shields.io/badge/TailwindCSS-blue?style=for-the-badge&logo=tailwind-css)
 
+## ✨ Features
+
+- **📢 Ads Profiling**: Discover what categories Meta has assigned to you and which advertisers are targeting your profile.
+- **👣 Digital Footprint**: Analyze your login history (IPs, devices, browsers) and the link history of websites you've visited via the Instagram browser.
+- **👥 Social Audit**: 
+  - Identify mutual followers.
+  - Detect "Fans" (people who follow you, but you don't follow back).
+  - List "Not Follow Back" (people you follow, but they don't follow you).
+  - **🤖 Bot Detection**: Heuristic-based detection of suspicious/bot-like accounts in your following list.
+- **🧭 File GPS**: Integrated guide to help you find the correct JSON files within your Meta data export.
+
+## 🛡️ Privacy First
+
+This application is built with privacy as a core value:
+- **No Data Uploads**: Your JSON files are processed entirely in your browser using client-side JavaScript.
+- **Local Analysis**: No data is sent to any server. Your sensitive information stays on your machine.
+- **Safe Commits**: The project is pre-configured to ignore all data files via `.gitignore`.
+
+## 🚀 Getting Started
+
+### 1. Clone the repository
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/RozyBrt/ig-transparency-dashboard.git
+cd ig-transparency-dashboard
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Install dependencies
+```bash
+npm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 3. Run the development server
+```bash
+npm run dev
+```
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 📂 How to Export Your Data
 
-## Learn More
+1. Go to Instagram **Settings** > **Accounts Center** > **Your information and permissions** > **Download your information**.
+2. Select **Download or transfer information**.
+3. Choose **Some of your information**.
+4. Select the following categories:
+   - **Ads information**
+   - **Logged information**
+   - **Connections (Followers and Following)**
+5. Choose **JSON** as the format and set the media quality to **Low** (since we only need text data).
+6. Once ready, download and extract the ZIP file.
 
-To learn more about Next.js, take a look at the following resources:
+## 🛠️ Tech Stack
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **Framework**: [Next.js 14](https://nextjs.org/) (App Router)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
+- **Icons**: [Lucide React](https://lucide.dev/)
+- **State Management**: [Zustand](https://github.com/pmndrs/zustand)
+- **Components**: [Shadcn UI](https://ui.shadcn.com/)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+Built with ❤️ for Data Transparency.
