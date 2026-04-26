@@ -1,175 +1,367 @@
-"use client";
+'use client';
 
-import React, { useCallback, useState } from "react";
-import { useDropzone } from "react-dropzone";
-import { useIGStore } from "@/lib/store";
-import { parseCategories, parseTopics, parseAdvertisers } from "@/lib/parsers/ads-profiling";
-import { parseLoginActivity, parseLinkHistory } from "@/lib/parsers/digital-footprint";
-import { parseFollowers, parseFollowing, analyzeSocialRelationship } from "@/lib/parsers/social";
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Upload, FileJson, CheckCircle2, AlertCircle, Loader2, Folder, Info } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { useCallback, useState } from 'react';
+import { useDropzone } from 'react-dropzone';
+import { useIGStore } from '@/lib/store';
+import { FILE_MAPPING } from '@/constants/fileMapping';
+import {
+  parseCategories,
+  parseTopics,
+  parseAdvertisers,
+} from '@/lib/parsers/ads-profiling';
+import {
+  parseLoginActivity,
+  parseLinkHistory,
+} from '@/lib/parsers/digital-footprint';
+import { parseFollowers, parseFollowing, analyzeSocialRelationship } from '@/lib/parsers/social';
+import type {
+  MetaCategoryJSON,
+  TopicsJSON,
+  AdvertiserJSON,
+  LoginActivityJSON,
+  LinkHistoryJSON,
+  FollowersJSON,
+  FollowingJSON,
+} from '@/types';
+
+type FileStatus = 'success' | 'error' | 'pending';
+
+interface UploadedFile {
+  name: string;
+  type: string;
+  status: FileStatus;
+  message: string;
+}
 
 export function UploadZone() {
   const store = useIGStore();
-  const [status, setStatus] = useState<{
-    type: "idle" | "loading" | "success" | "error";
-    message: string;
-  }>({ type: "idle", message: "" });
+  const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  const processFile = useCallback(
+    async (file: File) => {
+      const fileName = file.name.toLowerCase();
+      let fileType = 'Unknown';
+      let status: FileStatus = 'error';
+      let message = 'File tidak dikenal';
+
+      try {
+        const text = await file.text();
+        const json = JSON.parse(text);
+
+        // ─────────────────────────────────────────────────────
+        // ADS PROFILING
+        // ─────────────────────────────────────────────────────
+        if (fileName.includes('other_categories')) {
+          fileType = 'Meta Categories';
+          const data = parseCategories(json as MetaCategoryJSON);
+          store.setCategories(data);
+          status = 'success';
+          message = `✓ ${data.length} label dimuat`;
+        } else if (fileName.includes('recommended_topics')) {
+          fileType = 'Recommended Topics';
+          const data = parseTopics(json as TopicsJSON);
+          store.setTopics(data);
+          status = 'success';
+          message = `✓ ${data.length} topik dimuat`;
+        } else if (fileName.includes('advertisers_using')) {
+          fileType = 'Advertisers';
+          const data = parseAdvertisers(json as AdvertiserJSON);
+          store.setAdvertisers(data);
+          status = 'success';
+          message = `✓ ${data.length} pengiklan dimuat`;
+        }
+
+        // ─────────────────────────────────────────────────────
+        // DIGITAL FOOTPRINT
+        // ─────────────────────────────────────────────────────
+        else if (fileName.includes('login_activity')) {
+          fileType = 'Login Activity';
+          const data = parseLoginActivity(json as LoginActivityJSON);
+          store.setLoginActivity(data);
+          status = 'success';
+          message = `✓ ${data.length} login dimuat`;
+        } else if (fileName.includes('link_history')) {
+          fileType = 'Link History';
+          const data = parseLinkHistory(json as LinkHistoryJSON[]);
+          store.setLinkHistory(data);
+          status = 'success';
+          message = `✓ ${data.length} link dimuat`;
+        }
+
+        // ─────────────────────────────────────────────────────
+        // SOCIAL AUDIT
+        // ─────────────────────────────────────────────────────
+        else if (fileName.includes('followers')) {
+          fileType = 'Followers';
+          const data = parseFollowers(json as FollowersJSON);
+          store.setFollowers(data);
+          // Re-analyze if following already exists
+          if (store.following.length > 0) {
+            store.setSocialAnalysis(analyzeSocialRelationship(data, store.following));
+          }
+          status = 'success';
+          message = `✓ ${data.length} follower dimuat`;
+        } else if (
+          fileName.includes('following') &&
+          !fileName.includes('followers')
+        ) {
+          fileType = 'Following';
+          const data = parseFollowing(json as FollowingJSON);
+          store.setFollowing(data);
+          // Re-analyze if followers already exist
+          if (store.followers.length > 0) {
+            store.setSocialAnalysis(analyzeSocialRelationship(store.followers, data));
+          }
+          status = 'success';
+          message = `✓ ${data.length} following dimuat`;
+        } else {
+          fileType = 'Unknown File';
+          status = 'error';
+          message = '✗ Format file tidak dikenali';
+        }
+      } catch (error) {
+        fileType = 'Parse Error';
+        status = 'error';
+        message =
+          error instanceof SyntaxError
+            ? '✗ File JSON tidak valid'
+            : '✗ Error membaca file';
+      }
+
+      setUploadedFiles((prev) => [
+        ...prev,
+        {
+          name: file.name,
+          type: fileType,
+          status,
+          message,
+        },
+      ]);
+    },
+    [store]
+  );
 
   const onDrop = useCallback(
     async (acceptedFiles: File[]) => {
-      setStatus({ type: "loading", message: "Menganalisis file..." });
+      setIsProcessing(true);
+      setUploadedFiles([]);
 
-      try {
-        for (const file of acceptedFiles) {
-          const text = await file.text();
-          const json = JSON.parse(text);
-          const fileName = file.name.toLowerCase();
+      await Promise.all(acceptedFiles.map(processFile));
 
-          // Auto-detect based on JSON structure or filename
-          if (json.label_values && fileName.includes("your_topics")) {
-            // This is actually advertisers or categories sometimes depending on the file
-            // Let's check the structure more deeply if needed, but for now simple check:
-            if (fileName.includes("advertisers")) {
-               store.setAdvertisers(parseAdvertisers(json));
-            } else {
-               store.setCategories(parseCategories(json));
-            }
-          } 
-          else if (json.topics_your_topics) {
-            store.setTopics(parseTopics(json));
-          }
-          else if (json.label_values && (fileName.includes("advertisers") || fileName.includes("ads"))) {
-            store.setAdvertisers(parseAdvertisers(json));
-          }
-          else if (json.account_history_login_history || json.login_history || json.login_activity) {
-            // Handle multiple possible keys for login activity
-            const loginData = json.account_history_login_history || json.login_history || json.login_activity || [];
-            store.setLoginActivity(parseLoginActivity({ account_history_login_history: loginData }));
-          }
-          // Lebih fleksibel mendeteksi Link History (biasanya array of objects dengan label_values)
-          else if (Array.isArray(json) && (json.length === 0 || json[0].label_values || fileName.includes("link_history"))) {
-            store.setLinkHistory(parseLinkHistory(json));
-          }
-          else if (json.browser_history_link_history) {
-            // Kadang dibungkus dalam property ini
-            store.setLinkHistory(parseLinkHistory(json.browser_history_link_history));
-          }
-          else if (fileName.includes("followers") || fileName.includes("pengikut")) {
-            const followers = parseFollowers(json);
-            store.setFollowers(followers);
-            // Re-analyze if following already exists
-            if (store.following.length > 0) {
-              store.setSocialAnalysis(analyzeSocialRelationship(followers, store.following));
-            }
-          }
-          else if (json.relationships_following) {
-            const following = parseFollowing(json);
-            store.setFollowing(following);
-            // Re-analyze if followers already exist
-            if (store.followers.length > 0) {
-              store.setSocialAnalysis(analyzeSocialRelationship(store.followers, following));
-            }
-          }
-          else if (json.label_values && !fileName.includes("topics")) {
-             // Fallback to categories for label_values
-             store.setCategories(parseCategories(json));
-          }
-        }
-
-        setStatus({
-          type: "success",
-          message: `${acceptedFiles.length} file berhasil diproses!`,
-        });
-        
-        setTimeout(() => setStatus({ type: "idle", message: "" }), 3000);
-      } catch (error) {
-        console.error("Parsing error:", error);
-        setStatus({
-          type: "error",
-          message: "Gagal membaca file. Pastikan formatnya JSON Instagram asli.",
-        });
-      }
+      setIsProcessing(false);
     },
-    [store]
+    [processFile]
   );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: {
-      "application/json": [".json"],
+      'application/json': ['.json'],
     },
+    disabled: isProcessing,
   });
 
+  const successCount = uploadedFiles.filter((f) => f.status === 'success')
+    .length;
+  const errorCount = uploadedFiles.filter((f) => f.status === 'error').length;
+
   return (
-    <div className="w-full max-w-2xl mx-auto space-y-4">
+    <div className="w-full space-y-6">
+      {/* ─────────────────────────────────────────────────────
+          QUICK REFERENCE CARDS
+          ───────────────────────────────────────────────────── */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <FileGuideCard
+          title="📢 Ads Profiling"
+          files={FILE_MAPPING.PROFILING}
+        />
+        <FileGuideCard
+          title="👣 Digital Footprint"
+          files={FILE_MAPPING.FOOTPRINT}
+        />
+        <FileGuideCard title="👥 Social Audit" files={FILE_MAPPING.SOCIAL} />
+      </div>
+
+      {/* ─────────────────────────────────────────────────────
+          DROPZONE
+          ───────────────────────────────────────────────────── */}
       <div
         {...getRootProps()}
-        className={cn(
-          "relative group cursor-pointer overflow-hidden rounded-xl border-2 border-dashed transition-all duration-300",
-          isDragActive
-            ? "border-primary bg-primary/5 scale-[1.02]"
-            : "border-muted-foreground/20 hover:border-primary/50 hover:bg-accent/50"
-        )}
+        className={`
+          border-2 border-dashed rounded-lg p-12 text-center cursor-pointer
+          transition-all duration-200
+          ${
+            isDragActive
+              ? 'border-primary bg-primary/5 scale-[1.01]'
+              : 'border-zinc-800 hover:border-zinc-700 bg-zinc-900/50'
+          }
+          ${isProcessing ? 'opacity-50 cursor-not-allowed' : ''}
+        `}
       >
         <input {...getInputProps()} />
-        <div className="flex flex-col items-center justify-center py-12 px-6 text-center space-y-4">
-          <div className={cn(
-            "p-4 rounded-full bg-background shadow-sm transition-transform duration-300 group-hover:scale-110",
-            isDragActive && "scale-110 text-primary"
-          )}>
-            <Upload className="w-8 h-8 text-muted-foreground group-hover:text-primary transition-colors" />
-          </div>
-          
-          <div className="space-y-1">
-            <p className="text-lg font-semibold tracking-tight">
-              {isDragActive ? "Lepaskan file di sini" : "Upload Data Instagram"}
+
+        <div className="space-y-3">
+          <div className="text-4xl">📁</div>
+          <div>
+            <p className="text-lg font-semibold text-zinc-100">
+              {isDragActive
+                ? 'Drop file di sini'
+                : 'Drag & drop file JSON di sini'}
             </p>
-            <p className="text-sm text-muted-foreground">
-              Tarik & lepas file JSON dari folder ekspor Meta kamu.
+            <p className="text-sm text-zinc-500 mt-1">
+              atau klik untuk memilih file
             </p>
           </div>
-
-          <div className="w-full max-w-lg grid grid-cols-1 md:grid-cols-3 gap-3 pt-2">
-            <div className="flex flex-col items-center p-3 rounded-lg bg-muted/50 border border-muted-foreground/10">
-              <Folder className="w-4 h-4 mb-2 text-primary/60" />
-              <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1">Ads Info</span>
-              <span className="text-[10px] font-mono bg-background px-2 py-1 rounded">ads_information/</span>
-            </div>
-            <div className="flex flex-col items-center p-3 rounded-lg bg-muted/50 border border-muted-foreground/10">
-              <Folder className="w-4 h-4 mb-2 text-primary/60" />
-              <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1">Footprint</span>
-              <span className="text-[10px] font-mono bg-background px-2 py-1 rounded truncate w-full">security_and_login_...</span>
-            </div>
-            <div className="flex flex-col items-center p-3 rounded-lg bg-muted/50 border border-muted-foreground/10">
-              <Folder className="w-4 h-4 mb-2 text-primary/60" />
-              <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1">Social</span>
-              <span className="text-[10px] font-mono bg-background px-2 py-1 rounded truncate w-full">connections/follow...</span>
-            </div>
-          </div>
-
-          <div className="flex flex-col gap-2 items-center">
-            <div className="flex items-center gap-2 text-[10px] text-muted-foreground bg-accent/30 px-3 py-1 rounded-full border border-primary/10">
-              <Info className="w-3 h-3" />
-              <span>Gunakan file <b>login_activity.json</b> & <b>link_history.json</b></span>
-            </div>
-          </div>
+          <p className="text-xs text-zinc-600 mt-4">
+            Upload semua file dari folder masing-masing modul (lihat kartu
+            referensi di atas)
+          </p>
         </div>
       </div>
 
-      {status.type !== "idle" && (
-        <Card className={cn(
-          "p-4 flex items-center gap-3 animate-in fade-in slide-in-from-top-2 duration-300",
-          status.type === "error" ? "border-destructive/50 bg-destructive/5" : "border-primary/20 bg-primary/5"
-        )}>
-          {status.type === "loading" && <Loader2 className="w-5 h-5 animate-spin text-primary" />}
-          {status.type === "success" && <CheckCircle2 className="w-5 h-5 text-green-500" />}
-          {status.type === "error" && <AlertCircle className="w-5 h-5 text-destructive" />}
-          <span className="text-sm font-medium">{status.message}</span>
-        </Card>
+      {/* ─────────────────────────────────────────────────────
+          STATUS SUMMARY
+          ───────────────────────────────────────────────────── */}
+      {uploadedFiles.length > 0 && (
+        <div className="mt-6 space-y-4">
+          <div className="flex gap-4 text-sm">
+            {successCount > 0 && (
+              <div className="px-4 py-2 bg-green-500/10 text-green-500 rounded-lg font-medium border border-green-500/20">
+                ✓ {successCount} file berhasil
+              </div>
+            )}
+            {errorCount > 0 && (
+              <div className="px-4 py-2 bg-red-500/10 text-red-500 rounded-lg font-medium border border-red-500/20">
+                ✗ {errorCount} file gagal
+              </div>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            {uploadedFiles.map((file, idx) => (
+              <div
+                key={idx}
+                className={`
+                  p-4 rounded-lg border
+                  ${
+                    file.status === 'success'
+                      ? 'bg-green-500/5 border-green-500/20'
+                      : 'bg-red-500/5 border-red-500/20'
+                  }
+                `}
+              >
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <span className={file.status === 'success' ? 'text-green-500' : 'text-red-500'}>
+                        {file.status === 'success' ? '✓' : '✗'}
+                      </span>
+                      <div>
+                        <p className="font-medium text-zinc-100 text-sm">
+                          {file.type}
+                        </p>
+                        <p className="text-xs text-zinc-500 truncate">
+                          {file.name}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div
+                    className={`
+                      text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full whitespace-nowrap ml-2
+                      ${
+                        file.status === 'success'
+                          ? 'bg-green-500/10 text-green-500 border border-green-500/20'
+                          : 'bg-red-500/10 text-red-500 border border-red-500/20'
+                      }
+                    `}
+                  >
+                    {file.status === 'success' ? 'Loaded' : 'Failed'}
+                  </div>
+                </div>
+
+                <p className="text-xs text-zinc-400 mt-2">
+                  {file.message}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          <div className="flex gap-3 pt-4">
+            <button
+              onClick={() => setUploadedFiles([])}
+              disabled={isProcessing}
+              className={`
+                px-4 py-2 text-sm font-medium rounded-lg
+                bg-zinc-800 text-zinc-100 hover:bg-zinc-700
+                transition-colors
+                ${isProcessing ? 'opacity-50 cursor-not-allowed' : ''}
+              `}
+            >
+              Clear Status
+            </button>
+
+            {successCount > 0 && (
+              <button
+                onClick={() => {
+                  store.reset();
+                  setUploadedFiles([]);
+                }}
+                disabled={isProcessing}
+                className={`
+                  px-4 py-2 text-sm font-medium rounded-lg
+                  bg-red-500/10 text-red-500 hover:bg-red-500/20 border border-red-500/20
+                  transition-colors
+                  ${isProcessing ? 'opacity-50 cursor-not-allowed' : ''}
+                `}
+              >
+                Reset All Data
+              </button>
+            )}
+          </div>
+        </div>
       )}
+
+      {isProcessing && (
+        <div className="mt-6 flex items-center justify-center gap-2 text-zinc-500">
+          <div className="w-4 h-4 border-2 border-zinc-700 border-t-zinc-300 rounded-full animate-spin" />
+          <span className="text-sm">Processing files...</span>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// FILE GUIDE CARD COMPONENT
+// ─────────────────────────────────────────────────────────────
+
+interface FileGuideCardProps {
+  title: string;
+  files: (typeof FILE_MAPPING.PROFILING)[0][];
+}
+
+function FileGuideCard({ title, files }: FileGuideCardProps) {
+  return (
+    <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4">
+      <h3 className="font-bold text-zinc-200 mb-3 text-sm">{title}</h3>
+      <div className="space-y-2">
+        {files.map((file) => (
+          <div
+            key={file.id}
+            className="bg-zinc-800/50 rounded p-2 text-xs space-y-1"
+          >
+            <div className="flex items-center gap-2">
+              <span>{file.icon}</span>
+              <p className="font-medium text-zinc-300">{file.name}</p>
+            </div>
+            <p className="text-zinc-500 text-[10px] leading-tight">
+              📍 {file.hint}
+            </p>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
