@@ -158,6 +158,8 @@ export function AdvertiserSourceAnalysis() {
                   borderRadius: '8px',
                   fontSize: '12px'
                 }}
+                itemStyle={{ color: '#e4e4e7' }}
+                labelStyle={{ color: '#a1a1aa' }}
                 cursor={{ fill: '#ffffff05' }}
                 formatter={(...args: unknown[]) => [`${args[0]} advertiser`, 'Count']}
                 labelFormatter={(...args: unknown[]) => `Source: ${args[0]}`}

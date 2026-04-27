@@ -109,6 +109,8 @@ export function AdsCategoryDistribution() {
                 borderRadius: '8px',
                 fontSize: '12px'
               }}
+              itemStyle={{ color: '#e4e4e7' }}
+              labelStyle={{ color: '#a1a1aa' }}
               formatter={(...args: unknown[]) => {
                 const value = args[0] as number;
                 const name = args[1] as string;

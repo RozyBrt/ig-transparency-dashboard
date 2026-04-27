@@ -103,6 +103,8 @@ export function TopDomainsBarChart() {
             <YAxis stroke="#71717a" tick={{ fontSize: 10 }} />
             <Tooltip
               contentStyle={{ backgroundColor: '#18181b', border: '1px solid #3f3f46', borderRadius: '8px', fontSize: '11px' }}
+              itemStyle={{ color: '#e4e4e7' }}
+              labelStyle={{ color: '#a1a1aa' }}
               cursor={{ fill: '#ffffff05' }}
               labelFormatter={(...args: unknown[]) => {
                 const payload = args[1] as Array<{ payload: DomainDataItem }>;
