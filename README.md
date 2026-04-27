@@ -1,67 +1,152 @@
-# 📸 IG Transparency Dashboard
+# IG Intelligence Dashboard 🔍📊
 
-An interactive dashboard to analyze your Instagram data export. Understand how Meta profiles you, track your digital footprint, and audit your social relationships—all locally and privately.
+> **Local Instagram Data Audit Tool** — Transparansi data Meta dalam satu dashboard interaktif yang premium dan privacy-first.
 
-![Local Analysis Only](https://img.shields.io/badge/Privacy-Local%20Only-green?style=for-the-badge)
-![Next.js](https://img.shields.io/badge/Next.js%2014-black?style=for-the-badge&logo=next.js)
-![TailwindCSS](https://img.shields.io/badge/TailwindCSS-blue?style=for-the-badge&logo=tailwind-css)
+## 🎯 Overview
 
-## ✨ Features
+Dashboard ini menganalisis data Instagram kamu yang di-export dari Meta, memberikan insight mendalam yang biasanya tersembunyi di balik ribuan baris file JSON. Project ini berfokus pada visualisasi yang "berisik" tapi informatif dan keamanan data 100% lokal.
 
-- **📢 Ads Profiling**: Discover what categories Meta has assigned to you and which advertisers are targeting your profile.
-- **👣 Digital Footprint**: Analyze your login history (IPs, devices, browsers) and the link history of websites you've visited via the Instagram browser.
-- **👥 Social Audit**: 
-  - Identify mutual followers.
-  - Detect "Fans" (people who follow you, but you don't follow back).
-  - List "Not Follow Back" (people you follow, but they don't follow you).
-  - **🤖 Bot Detection**: Heuristic-based detection of suspicious/bot-like accounts in your following list.
-- **🧭 File GPS**: Integrated guide to help you find the correct JSON files within your Meta data export.
+### Key Features
+✅ **Privacy-First**: Semua processing dilakukan local di browser (tidak ada data yang dikirim ke server).
+✅ **Smart Classification**: AI-powered categorization untuk bisnis (13+ kategori), data source, & privacy risk.
+✅ **Deep Visualization**: Interactive Heatmap, pie charts, dan bar charts menggunakan Recharts.
+✅ **Security Focused**: Severity scoring untuk menilai seberapa jauh privasi kamu terancam oleh pengiklan.
 
-## 🛡️ Privacy First
+---
 
-This application is built with privacy as a core value:
-- **No Data Uploads**: Your JSON files are processed entirely in your browser using client-side JavaScript.
-- **Local Analysis**: No data is sent to any server. Your sensitive information stays on your machine.
-- **Safe Commits**: The project is pre-configured to ignore all data files via `.gitignore`.
+## 🏗️ Architecture & Tech Stack
+
+### Tech Stack
+- **Framework**: [Next.js 14](https://nextjs.org/) (App Router)
+- **Language**: [TypeScript](https://www.typescriptlang.org/)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
+- **State Management**: [Zustand](https://docs.pmnd.rs/zustand/)
+- **Visualization**: [Recharts](https://recharts.org/)
+- **Icons**: [Lucide React](https://lucide.dev/)
+
+### Architecture Diagram
+```text
+┌─────────────────────────────────────────────────┐
+│         Meta Data Export (JSON)                 │
+│  ads_interests.json, login_activity.json, dll.  │
+└──────────────┬──────────────────────────────────┘
+               │
+               ▼
+        ┌─────────────┐
+        │ UploadZone  │ ◄── Auto-detect filename & status
+        └──────┬──────┘
+               │
+               ▼
+    ┌──────────────────────┐
+    │   Data Parsers       │
+    │ ┌──────────────────┐ │
+    │ │ Ads Profiling    │ │ ◄── 13+ Category Classification
+    │ │ Digital Footprint│ │ ◄── Device & UA Detection
+    │ │ Social Audit     │ │ ◄── Bot & Relationship Analysis
+    │ └──────────────────┘ │
+    └──────────┬───────────┘
+               │
+               ▼
+        ┌──────────────┐
+        │  Zustand     │ ◄── Persistent Global State
+        │   Store      │
+        └──────┬───────┘
+               │
+               ▼
+    ┌──────────────────────┐
+    │   Components         │
+    │ ┌──────────────────┐ │
+    │ │ ProfilingModule  │ │
+    │ │ FootprintModule  │ │
+    │ │ SocialModule     │ │
+    │ └──────────────────┘ │
+    └──────────┬───────────┘
+               │
+               ▼
+    ┌──────────────────────┐
+    │   Charts & Tables    │
+    │  (Recharts, Tailwind)│
+    └──────────────────────┘
+
+💡 100% Client-Side | No Backend | No Data Transmission
+```
+
+---
+
+## 📊 Modules Insight
+
+## 📈 Visualization & Modules
+
+### 1. Upload Centre (Overview)
+![Upload Centre](docs/screenshots/upload_centre.png)
+Pintu masuk utama untuk proses data. Sistem auto-detect file yang kamu masukkan dan memberikan status real-time.
+
+### 2. Ads Profiling Module
+![Ads Profiling](docs/screenshots/ads_profiling.png)
+Menganalisis bagaimana Meta melabeli kamu dan siapa saja yang memiliki data kamu.
+- **Kategori Bisnis**: Mengelompokkan pengiklan ke dalam 13+ kategori (Fintech, E-commerce, Health, dll).
+- **Data Source Analysis**: Mendeteksi cara pengiklan mendapatkan data kamu (Email upload, Website tracking, dll).
+- **Privacy Insight**: Memberikan skor tingkat risiko (High/Medium/Low) berdasarkan akses data pengiklan.
+
+### 3. Digital Footprint Module
+![Digital Footprint](docs/screenshots/digital_footprint.png)
+Menganalisis jejak digital teknis kamu selama menggunakan platform.
+- **Login Heatmap**: Visualisasi jam-jam aktif kamu di Instagram.
+- **Device & OS Analysis**: Mendeteksi perangkat dan browser yang pernah digunakan.
+- **Top Domains**: Ranking website yang paling sering kamu kunjungi via IG in-app browser.
+
+### 4. Social Audit Module
+![Social Analysis](docs/screenshots/social_analysis.png)
+Analisis hubungan followers/following.
+- **Bot Detection**: Heuristic patterns untuk mendeteksi username mencurigakan.
+- **Mutual Check**: Mencari siapa yang tidak follow balik secara instan.
+
+---
 
 ## 🚀 Getting Started
 
-### 1. Clone the repository
+### Prerequisites
+- Node.js 18+
+- npm / yarn / pnpm
+
+### Installation
+
 ```bash
+# Clone repository
 git clone https://github.com/RozyBrt/ig-transparency-dashboard.git
 cd ig-transparency-dashboard
-```
 
-### 2. Install dependencies
-```bash
+# Install dependencies
 npm install
-```
 
-### 3. Run the development server
-```bash
+# Run development server
 npm run dev
 ```
-Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-## 📂 How to Export Your Data
-
-1. Go to Instagram **Settings** > **Accounts Center** > **Your information and permissions** > **Download your information**.
-2. Select **Download or transfer information**.
-3. Choose **Some of your information**.
-4. Select the following categories:
-   - **Ads information**
-   - **Logged information**
-   - **Connections (Followers and Following)**
-5. Choose **JSON** as the format and set the media quality to **Low** (since we only need text data).
-6. Once ready, download and extract the ZIP file.
-
-## 🛠️ Tech Stack
-
-- **Framework**: [Next.js 14](https://nextjs.org/) (App Router)
-- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
-- **Icons**: [Lucide React](https://lucide.dev/)
-- **State Management**: [Zustand](https://github.com/pmndrs/zustand)
-- **Components**: [Shadcn UI](https://ui.shadcn.com/)
+Buka [http://localhost:3000](http://localhost:3000) di browser kamu.
 
 ---
-Built with ❤️ for Data Transparency.
+
+## 🤝 Collaboration & Credits
+
+Project ini adalah hasil kolaborasi antara ide manusia dan eksekusi AI:
+
+- **Ide & Quality Assurance**: [Rozi](https://github.com/RozyBrt)
+- **Blueprint & Arsitektur**: [Claude AI](https://claude.ai/) (Memberikan struktur folder, definisi tipe data, dan pola store).
+- **Implementasi & Eksekusi**: [Antigravity AI](https://gemini.google.com/) (Membangun logic parser, implementasi UI/UX, integrasi grafik, dan perbaikan teknis).
+
+---
+
+## 🔐 Privacy & Security
+
+Aplikasi ini tidak memiliki database atau backend. Semua data yang kamu upload hanya berada di memory browser kamu dan akan hilang saat tab ditutup. **Kami tidak pernah melihat, menyimpan, atau mengirim data kamu ke mana pun.**
+
+---
+
+## 📄 License
+
+Project ini dilisensikan di bawah [MIT License](LICENSE). Bebas digunakan untuk keperluan personal atau pembelajaran.
+
+---
+
+**Built with ❤️ for Data Transparency**
