@@ -4,37 +4,28 @@ import type {
   FollowerEntry,
   FollowingEntry,
   SocialAnalysis,
+  FollowersJSON,
+  FollowingJSON,
 } from '@/types';
 
 // ═══════════════════════════════════════════════════════════
 // FOLLOWERS PARSER
 // ═══════════════════════════════════════════════════════════
 
-interface RawFollowerItem {
-  title?: string;
-  href?: string;
-  timestamp?: number;
-  string_list_data?: Array<{
-    href: string;
-    value: string;
-    timestamp: number;
-  }>;
-}
-
-export function parseFollowers(data: RawFollowerItem[] | { string_list_data: RawFollowerItem[] }): FollowerEntry[] {
-  const rawArr = Array.isArray(data) ? data : data.string_list_data || [];
+export function parseFollowers(data: FollowersJSON[] | FollowersJSON): FollowerEntry[] {
+  const rawArr = Array.isArray(data) ? data : (data.string_list_data ? [data] : []);
   
   return rawArr
-    .map((item: RawFollowerItem) => {
-      const stringData = item.string_list_data?.[0] || {};
-      const username = stringData.value || item.title || "";
-      const ts = stringData.timestamp || item.timestamp || 0;
+    .map((item: FollowersJSON) => {
+      const stringData = item.string_list_data?.[0];
+      const username = stringData?.value || item.title || "";
+      const ts = stringData?.timestamp || 0;
 
       return {
         username,
         timestamp: ts,
         date: ts ? new Date(ts * 1000) : new Date(),
-        href: stringData.href || item.href || `https://instagram.com/${username}`,
+        href: stringData?.href || `https://instagram.com/${username}`,
       };
     })
     .filter((x) => x.username)
@@ -45,33 +36,22 @@ export function parseFollowers(data: RawFollowerItem[] | { string_list_data: Raw
 // FOLLOWING PARSER
 // ═══════════════════════════════════════════════════════════
 
-interface RawFollowingItem {
-  title?: string;
-  href?: string;
-  timestamp?: number;
-  string_list_data?: Array<{
-    href: string;
-    value: string;
-    timestamp: number;
-  }>;
-}
-
-export function parseFollowing(data: { relationships_following?: RawFollowingItem[] } | RawFollowingItem[]): FollowingEntry[] {
-  const rawArr = ('relationships_following' in data) 
+export function parseFollowing(data: FollowingJSON | FollowingJSON['relationships_following']): FollowingEntry[] {
+  const rawArr = (data && typeof data === 'object' && 'relationships_following' in data) 
     ? data.relationships_following || [] 
     : (Array.isArray(data) ? data : []);
 
   return rawArr
-    .map((item: RawFollowingItem) => {
-      const stringData = item.string_list_data?.[0] || {};
-      const username = item.title || stringData.value || "";
-      const ts = stringData.timestamp || item.timestamp || 0;
+    .map((item) => {
+      const stringData = item.string_list_data?.[0] || { href: '', timestamp: 0 };
+      const username = item.title || '';
+      const ts = stringData.timestamp || 0;
 
       return {
         username,
         timestamp: ts,
         date: ts ? new Date(ts * 1000) : new Date(),
-        href: stringData.href || item.href || `https://instagram.com/${username}`,
+        href: stringData.href || `https://instagram.com/${username}`,
         followsBack: false,
         suspicious: isSuspiciousUsername(username),
       };

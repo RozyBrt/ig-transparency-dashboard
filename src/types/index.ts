@@ -162,6 +162,7 @@ export interface LinkHistoryJSON {
 }
 
 export interface FollowersJSON {
+  title?: string;
   string_list_data?: Array<{
     href: string;
     value: string;
