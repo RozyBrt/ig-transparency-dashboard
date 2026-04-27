@@ -18,6 +18,7 @@
     "react": "^18",
     "react-dom": "^18",
     "react-dropzone": "^15.0.0",
+    "recharts": "^3.8.1",
     "shadcn": "^4.4.0",
     "tailwind-merge": "^3.5.0",
     "tailwindcss-animate": "^1.0.7",

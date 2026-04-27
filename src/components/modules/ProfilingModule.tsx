@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo } from "react";
 import { useIGStore } from "@/lib/store";
+import { AdsCategoryDistribution } from '@/components/charts';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -105,6 +106,9 @@ export function ProfilingModule() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Charts Section */}
+      <AdsCategoryDistribution />
 
       {/* Daftar Pengiklan Section */}
       {advertisers.length > 0 ? (
