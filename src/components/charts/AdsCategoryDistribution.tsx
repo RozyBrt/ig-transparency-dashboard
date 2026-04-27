@@ -10,6 +10,7 @@ import {
   Legend,
   Tooltip,
   ResponsiveContainer,
+  PieLabelRenderProps,
 } from 'recharts';
 import { useIGStore } from '@/lib/store';
 import type { MetaCategory } from '@/types';
@@ -90,7 +91,7 @@ export function AdsCategoryDistribution() {
               cx="50%"
               cy="50%"
               labelLine={false}
-              label={(props: DistributionItem) => `${props.name} (${props.percentage}%)`}
+              label={(props: PieLabelRenderProps & DistributionItem) => `${props.name} (${props.percentage}%)`}
               outerRadius={100}
               dataKey="value"
             >
