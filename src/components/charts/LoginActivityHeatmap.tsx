@@ -109,7 +109,8 @@ export function LoginActivityHeatmap() {
                 backgroundColor: '#18181b',
                 border: '1px solid #3f3f46',
                 borderRadius: '8px',
-                fontSize: '12px'
+                fontSize: '12px',
+                color: '#e4e4e7'
               }}
               itemStyle={{ color: '#e4e4e7' }}
               labelStyle={{ color: '#a1a1aa' }}

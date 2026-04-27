@@ -102,7 +102,7 @@ export function TopDomainsBarChart() {
             <XAxis dataKey="displayName" stroke="#71717a" tick={{ fontSize: 9 }} angle={-45} textAnchor="end" height={60} />
             <YAxis stroke="#71717a" tick={{ fontSize: 10 }} />
             <Tooltip
-              contentStyle={{ backgroundColor: '#18181b', border: '1px solid #3f3f46', borderRadius: '8px', fontSize: '11px' }}
+              contentStyle={{ backgroundColor: '#18181b', border: '1px solid #3f3f46', borderRadius: '8px', fontSize: '11px', color: '#e4e4e7' }}
               itemStyle={{ color: '#e4e4e7' }}
               labelStyle={{ color: '#a1a1aa' }}
               cursor={{ fill: '#ffffff05' }}
