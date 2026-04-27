@@ -106,7 +106,7 @@ export function AdsCategoryDistribution() {
                 borderRadius: '8px',
                 fontSize: '12px'
               }}
-              formatter={(value: number, name: string, props: { payload: DistributionItem }) => [
+              formatter={(value: number | string, name: string, props: { payload: DistributionItem }) => [
                 `${value} label (${props.payload.percentage}%)`,
                 name,
               ]}

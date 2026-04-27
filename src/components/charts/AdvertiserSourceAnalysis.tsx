@@ -159,7 +159,7 @@ export function AdvertiserSourceAnalysis() {
                   fontSize: '12px'
                 }}
                 cursor={{ fill: '#ffffff05' }}
-                formatter={(value: number) => [`${value} advertiser`, 'Count']}
+                formatter={(value: number | string) => [`${value} advertiser`, 'Count']}
                 labelFormatter={(label: string) => `Source: ${label}`}
               />
               <Bar dataKey="count" radius={[4, 4, 0, 0]}>

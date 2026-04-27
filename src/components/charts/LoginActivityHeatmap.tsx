@@ -112,7 +112,7 @@ export function LoginActivityHeatmap() {
                 fontSize: '12px'
               }}
               cursor={{ fill: '#ffffff05' }}
-              formatter={(value: number) => [`${value} login`, 'Count']}
+              formatter={(value: number | string) => [`${value} login`, 'Count']}
               labelFormatter={(label: string) => `Jam: ${label}`}
             />
             <Bar dataKey="count" radius={[4, 4, 0, 0]}>
