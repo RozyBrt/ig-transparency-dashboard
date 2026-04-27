@@ -9,7 +9,8 @@ Dashboard ini menganalisis data Instagram kamu yang di-export dari Meta, memberi
 ### Key Features
 ✅ **Privacy-First**: Semua processing dilakukan local di browser (tidak ada data yang dikirim ke server).
 ✅ **Smart Classification**: AI-powered categorization untuk bisnis (13+ kategori), data source, & privacy risk.
-✅ **Deep Visualization**: Interactive Heatmap, pie charts, dan bar charts menggunakan Recharts.
+✅ ✅ **Deep Visualization**: Interactive Heatmap, pie charts, dan bar charts menggunakan Recharts.
+✅ **Mobile Responsive**: Dashboard dioptimalkan untuk tampilan HP dengan Mobile Navigation Bar.
 ✅ **Security Focused**: Severity scoring untuk menilai seberapa jauh privasi kamu terancam oleh pengiklan.
 
 ---
@@ -78,7 +79,7 @@ Dashboard ini menganalisis data Instagram kamu yang di-export dari Meta, memberi
 ## 📈 Visualization & Modules
 
 ### 1. Upload Centre (Overview)
-![Upload Centre](docs/screenshots/upload_centre.png)
+![Upload Centre](docs/screenshots/upload_center.png)
 Pintu masuk utama untuk proses data. Sistem auto-detect file yang kamu masukkan dan memberikan status real-time.
 
 ### 2. Ads Profiling Module
