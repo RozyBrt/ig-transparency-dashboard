@@ -3,3 +3,4 @@
 export { LoginActivityHeatmap } from './LoginActivityHeatmap';
 export { AdsCategoryDistribution } from './AdsCategoryDistribution';
 export { TopDomainsBarChart } from './TopDomainsBarChart';
+export { AdvertiserSourceAnalysis } from './AdvertiserSourceAnalysis';

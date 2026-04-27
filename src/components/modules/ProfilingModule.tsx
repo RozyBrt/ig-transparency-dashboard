@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from "react";
 import { useIGStore } from "@/lib/store";
-import { AdsCategoryDistribution } from '@/components/charts';
+import { AdsCategoryDistribution, AdvertiserSourceAnalysis } from '@/components/charts';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -108,7 +108,10 @@ export function ProfilingModule() {
       </div>
 
       {/* Charts Section */}
-      <AdsCategoryDistribution />
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <AdsCategoryDistribution />
+        <AdvertiserSourceAnalysis />
+      </div>
 
       {/* Daftar Pengiklan Section */}
       {advertisers.length > 0 ? (
@@ -154,8 +157,20 @@ export function ProfilingModule() {
                           {adv.type}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-right pr-6 text-xs text-muted-foreground italic">
-                        {adv.sourceGroup}
+                      <TableCell className="text-right pr-6">
+                        <div className="flex flex-col items-end">
+                           <span className="text-xs text-muted-foreground italic">{adv.sourceGroup}</span>
+                           {adv.dataSource && (
+                             <Badge variant="outline" className={cn(
+                               "mt-1 text-[9px] px-1 h-4",
+                               adv.dataSeverity === 'high' ? "border-red-500/50 text-red-500" :
+                               adv.dataSeverity === 'medium' ? "border-amber-500/50 text-amber-500" :
+                               "border-green-500/50 text-green-500"
+                             )}>
+                               {adv.dataSource.icon} {adv.dataSource.name}
+                             </Badge>
+                           )}
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}

@@ -14,6 +14,13 @@ export interface Advertiser {
   name: string;           // Nama pengiklan
   type: string;           // Tipe hasil klasifikasi (e-commerce, tech, dll)
   sourceGroup: string;    // Group asli dari Meta
+  dataSource?: {          // NEW: Sumber data & cara mereka dapet data
+    name: string;         // Kategori sumber (Uploaded Email, Website Activity, dll)
+    description: string;  // Penjelasan user-friendly
+    icon: string;         // Icon emoji
+    severity: 'low' | 'medium' | 'high'; // Privacy concern level
+  };
+  dataSeverity?: 'low' | 'medium' | 'high'; // Privacy severity
 }
 
 // ═══════════════════════════════════════════════════════════
