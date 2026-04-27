@@ -112,8 +112,8 @@ export function LoginActivityHeatmap() {
                 fontSize: '12px'
               }}
               cursor={{ fill: '#ffffff05' }}
-              formatter={(value: number | string) => [`${value} login`, 'Count']}
-              labelFormatter={(label: string) => `Jam: ${label}`}
+              formatter={(...args: unknown[]) => [`${args[0]} login`, 'Count']}
+              labelFormatter={(...args: unknown[]) => `Jam: ${args[0]}`}
             />
             <Bar dataKey="count" radius={[4, 4, 0, 0]}>
               {hourlyData.map((entry, index) => (

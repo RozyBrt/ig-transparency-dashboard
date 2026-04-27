@@ -104,7 +104,10 @@ export function TopDomainsBarChart() {
             <Tooltip
               contentStyle={{ backgroundColor: '#18181b', border: '1px solid #3f3f46', borderRadius: '8px', fontSize: '11px' }}
               cursor={{ fill: '#ffffff05' }}
-              labelFormatter={(_: string, payload: Array<{ payload: DomainDataItem }>) => payload?.[0]?.payload?.domain || ''}
+              labelFormatter={(...args: unknown[]) => {
+                const payload = args[1] as Array<{ payload: DomainDataItem }>;
+                return payload?.[0]?.payload?.domain || '';
+              }}
             />
             <Bar dataKey="count" radius={[4, 4, 0, 0]}>
               {topDomainsData.map((entry, index) => (

@@ -91,7 +91,10 @@ export function AdsCategoryDistribution() {
               cx="50%"
               cy="50%"
               labelLine={false}
-              label={(props: PieLabelRenderProps & DistributionItem) => `${props.name} (${props.percentage}%)`}
+              label={(props: PieLabelRenderProps) => {
+                const entry = props as PieLabelRenderProps & { percentage: string };
+                return `${entry.name} (${entry.percentage}%)`;
+              }}
               outerRadius={100}
               dataKey="value"
             >
@@ -106,10 +109,12 @@ export function AdsCategoryDistribution() {
                 borderRadius: '8px',
                 fontSize: '12px'
               }}
-              formatter={(value: number | string, name: string, props: { payload: DistributionItem }) => [
-                `${value} label (${props.payload.percentage}%)`,
-                name,
-              ]}
+              formatter={(...args: unknown[]) => {
+                const value = args[0] as number;
+                const name = args[1] as string;
+                const entry = args[2] as { payload: DistributionItem };
+                return [`${value} label (${entry.payload.percentage}%)`, name];
+              }}
             />
             <Legend
               wrapperStyle={{ paddingTop: '20px', fontSize: '11px' }}
