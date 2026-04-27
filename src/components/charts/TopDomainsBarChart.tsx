@@ -18,6 +18,14 @@ import type { LinkEntry } from '@/types';
 
 const DOMAIN_COLORS = ['#22c55e', '#06b6d4', '#f59e0b', '#ef4444', '#8b5cf6'];
 
+interface DomainDataItem {
+  domain: string;
+  count: number;
+  totalDuration: number;
+  avgDuration: number;
+  displayName: string;
+}
+
 export function TopDomainsBarChart() {
   const { linkHistory } = useIGStore();
   const [isMounted, setIsMounted] = useState(false);
@@ -48,13 +56,7 @@ export function TopDomainsBarChart() {
         }
         return acc;
       },
-      [] as Array<{
-        domain: string;
-        count: number;
-        totalDuration: number;
-        avgDuration: number;
-        displayName: string;
-      }>
+      [] as DomainDataItem[]
     );
 
     domainCounts.forEach((d) => {
@@ -102,7 +104,7 @@ export function TopDomainsBarChart() {
             <Tooltip
               contentStyle={{ backgroundColor: '#18181b', border: '1px solid #3f3f46', borderRadius: '8px', fontSize: '11px' }}
               cursor={{ fill: '#ffffff05' }}
-              labelFormatter={(_: any, payload: any) => payload?.[0]?.payload?.domain || ''}
+              labelFormatter={(_: string, payload: Array<{ payload: DomainDataItem }>) => payload?.[0]?.payload?.domain || ''}
             />
             <Bar dataKey="count" radius={[4, 4, 0, 0]}>
               {topDomainsData.map((entry, index) => (

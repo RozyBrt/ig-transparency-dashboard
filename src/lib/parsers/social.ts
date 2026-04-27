@@ -3,8 +3,6 @@
 import type {
   FollowerEntry,
   FollowingEntry,
-  FollowersJSON,
-  FollowingJSON,
   SocialAnalysis,
 } from '@/types';
 
@@ -12,13 +10,22 @@ import type {
 // FOLLOWERS PARSER
 // ═══════════════════════════════════════════════════════════
 
-export function parseFollowers(data: any): FollowerEntry[] {
-  // Struktur Meta: Array of objects, masing-masing punya string_list_data[0]
+interface RawFollowerItem {
+  title?: string;
+  href?: string;
+  timestamp?: number;
+  string_list_data?: Array<{
+    href: string;
+    value: string;
+    timestamp: number;
+  }>;
+}
+
+export function parseFollowers(data: RawFollowerItem[] | { string_list_data: RawFollowerItem[] }): FollowerEntry[] {
   const rawArr = Array.isArray(data) ? data : data.string_list_data || [];
   
   return rawArr
-    .map((item: any) => {
-      // Kadang username ada di 'value' dalam string_list_data[0]
+    .map((item: RawFollowerItem) => {
       const stringData = item.string_list_data?.[0] || {};
       const username = stringData.value || item.title || "";
       const ts = stringData.timestamp || item.timestamp || 0;
@@ -30,20 +37,32 @@ export function parseFollowers(data: any): FollowerEntry[] {
         href: stringData.href || item.href || `https://instagram.com/${username}`,
       };
     })
-    .filter((x: any) => x.username)
-    .sort((a: any, b: any) => b.timestamp - a.timestamp);
+    .filter((x) => x.username)
+    .sort((a, b) => b.timestamp - a.timestamp);
 }
 
 // ═══════════════════════════════════════════════════════════
 // FOLLOWING PARSER
 // ═══════════════════════════════════════════════════════════
 
-export function parseFollowing(data: any): FollowingEntry[] {
-  // Struktur Meta: Object dengan key 'relationships_following' berisi array
-  const rawArr = data.relationships_following || (Array.isArray(data) ? data : []);
+interface RawFollowingItem {
+  title?: string;
+  href?: string;
+  timestamp?: number;
+  string_list_data?: Array<{
+    href: string;
+    value: string;
+    timestamp: number;
+  }>;
+}
+
+export function parseFollowing(data: { relationships_following?: RawFollowingItem[] } | RawFollowingItem[]): FollowingEntry[] {
+  const rawArr = ('relationships_following' in data) 
+    ? data.relationships_following || [] 
+    : (Array.isArray(data) ? data : []);
 
   return rawArr
-    .map((item: any) => {
+    .map((item: RawFollowingItem) => {
       const stringData = item.string_list_data?.[0] || {};
       const username = item.title || stringData.value || "";
       const ts = stringData.timestamp || item.timestamp || 0;
@@ -57,8 +76,8 @@ export function parseFollowing(data: any): FollowingEntry[] {
         suspicious: isSuspiciousUsername(username),
       };
     })
-    .filter((x: any) => x.username)
-    .sort((a: any, b: any) => b.timestamp - a.timestamp);
+    .filter((x) => x.username)
+    .sort((a, b) => b.timestamp - a.timestamp);
 }
 
 // ═══════════════════════════════════════════════════════════

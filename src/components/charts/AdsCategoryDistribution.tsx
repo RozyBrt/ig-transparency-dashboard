@@ -19,6 +19,12 @@ const COLORS = [
   '#8b5cf6', '#ec4899', '#14b8a6', '#f97316',
 ];
 
+interface DistributionItem {
+  name: string;
+  value: number;
+  percentage: string;
+}
+
 export function AdsCategoryDistribution() {
   const { categories } = useIGStore();
   const [isMounted, setIsMounted] = useState(false);
@@ -44,7 +50,7 @@ export function AdsCategoryDistribution() {
         }
         return acc;
       },
-      [] as Array<{ name: string; value: number; percentage: string }>
+      [] as DistributionItem[]
     );
 
     const total = categories.length;
@@ -84,7 +90,7 @@ export function AdsCategoryDistribution() {
               cx="50%"
               cy="50%"
               labelLine={false}
-              label={({ name, percentage }: any) => `${name} (${percentage}%)`}
+              label={(props: DistributionItem) => `${props.name} (${props.percentage}%)`}
               outerRadius={100}
               dataKey="value"
             >
@@ -99,9 +105,9 @@ export function AdsCategoryDistribution() {
                 borderRadius: '8px',
                 fontSize: '12px'
               }}
-              formatter={(value: any, name: any, props: any) => [
+              formatter={(value: number, name: string, props: { payload: DistributionItem }) => [
                 `${value} label (${props.payload.percentage}%)`,
-                props.payload.name,
+                name,
               ]}
             />
             <Legend

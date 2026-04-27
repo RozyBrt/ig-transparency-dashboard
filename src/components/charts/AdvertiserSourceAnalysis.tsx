@@ -14,7 +14,6 @@ import {
   Cell,
 } from 'recharts';
 import { useIGStore } from '@/lib/store';
-import { getDataSourceMetadata } from '@/lib/parsers/ads-profiling';
 import type { Advertiser } from '@/types';
 
 const SEVERITY_COLORS = {
@@ -22,6 +21,15 @@ const SEVERITY_COLORS = {
   medium: '#f59e0b',  // amber-500
   low: '#22c55e',     // green-500
 };
+
+interface SourceItem {
+  source: string;
+  count: number;
+  severity: 'low' | 'medium' | 'high';
+  description: string;
+  icon: string;
+  advertisers: string[];
+}
 
 export function AdvertiserSourceAnalysis() {
   const { advertisers } = useIGStore();
@@ -56,14 +64,7 @@ export function AdvertiserSourceAnalysis() {
         }
         return acc;
       },
-      [] as Array<{
-        source: string;
-        count: number;
-        severity: 'low' | 'medium' | 'high';
-        description: string;
-        icon: string;
-        advertisers: string[];
-      }>
+      [] as SourceItem[]
     );
 
     return sources.sort((a, b) => {
@@ -158,8 +159,8 @@ export function AdvertiserSourceAnalysis() {
                   fontSize: '12px'
                 }}
                 cursor={{ fill: '#ffffff05' }}
-                formatter={(value: any) => [`${value} advertiser`, 'Count']}
-                labelFormatter={(label: any) => `Source: ${label}`}
+                formatter={(value: number) => [`${value} advertiser`, 'Count']}
+                labelFormatter={(label: string) => `Source: ${label}`}
               />
               <Bar dataKey="count" radius={[4, 4, 0, 0]}>
                 {sourceAnalysis.map((entry, index) => (

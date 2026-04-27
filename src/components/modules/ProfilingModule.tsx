@@ -177,7 +177,7 @@ export function ProfilingModule() {
                   {filteredAdvertisers.length === 0 && (
                     <TableRow>
                       <TableCell colSpan={3} className="h-32 text-center text-muted-foreground">
-                        Tidak ada pengiklan yang cocok dengan pencarian "{searchTerm}"
+                        Tidak ada pengiklan yang cocok dengan pencarian &quot;{searchTerm}&quot;
                       </TableCell>
                     </TableRow>
                   )}

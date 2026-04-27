@@ -7,7 +7,6 @@ import {
   getSocialStats,
 } from '@/lib/parsers/social';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Users, UserMinus, UserCheck, AlertTriangle, Search, ExternalLink } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -347,7 +346,7 @@ function ListTab({
           ) : (
             <div className="p-12 text-center text-muted-foreground flex flex-col items-center gap-2">
               <Search className="w-8 h-8 opacity-20" />
-              <p>Tidak ada hasil untuk "{searchQuery}"</p>
+              <p>Tidak ada hasil untuk &quot;{searchQuery}&quot;</p>
             </div>
           )}
         </div>

@@ -2,7 +2,7 @@
 
 import { useIGStore } from '@/lib/store';
 import { LoginActivityHeatmap, TopDomainsBarChart } from '@/components/charts';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { LogIn, Link2 } from "lucide-react";
 
 export function FootprintModule() {

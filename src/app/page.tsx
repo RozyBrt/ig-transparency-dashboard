@@ -50,7 +50,7 @@ export default function DashboardPage() {
             return (
               <button
                 key={item.id}
-                onClick={() => setActiveTab(item.id as any)}
+                onClick={() => setActiveTab(item.id as "upload" | "profiling" | "footprint" | "social")}
                 className={cn(
                   "w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all",
                   activeTab === item.id

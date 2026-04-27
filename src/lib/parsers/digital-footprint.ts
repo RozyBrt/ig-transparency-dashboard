@@ -83,8 +83,13 @@ function parseOS(ua: string): string {
 // LINK HISTORY PARSER
 // ═══════════════════════════════════════════════════════════
 
+interface LabelValue {
+  label: string;
+  value: string;
+}
+
 export function parseLinkHistory(
-  data: LinkHistoryJSON[] | { timestamp: number; label_values: any[] }[]
+  data: LinkHistoryJSON[] | { timestamp: number; label_values: LabelValue[] }[]
 ): LinkEntry[] {
   const arr = Array.isArray(data) ? data : [];
 
@@ -92,7 +97,7 @@ export function parseLinkHistory(
     .map((item) => {
       const labels = item.label_values || [];
       const get = (label: string) =>
-        labels.find((l: any) => l.label === label)?.value || '';
+        labels.find((l: LabelValue) => l.label === label)?.value || '';
 
       const url = get('Website link you visited');
       const title = get('Title of website page you visited');

@@ -100,12 +100,12 @@ export type FileType =
   | 'following';
 
 export function getFileMapping(id: FileType) {
-  for (const module of [
+  for (const config of [
     ...FILE_MAPPING.PROFILING,
     ...FILE_MAPPING.FOOTPRINT,
     ...FILE_MAPPING.SOCIAL,
   ]) {
-    if (module.id === id) return module;
+    if (config.id === id) return config;
   }
   return null;
 }

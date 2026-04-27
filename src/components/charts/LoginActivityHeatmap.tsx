@@ -16,6 +16,13 @@ import {
 import { useIGStore } from '@/lib/store';
 import type { LoginEntry } from '@/types';
 
+interface HourlyDataItem {
+  hour: number;
+  hourLabel: string;
+  count: number;
+  percentage: number;
+}
+
 export function LoginActivityHeatmap() {
   const { loginActivity } = useIGStore();
   const [isMounted, setIsMounted] = useState(false);
@@ -28,7 +35,7 @@ export function LoginActivityHeatmap() {
   const hourlyData = useMemo(() => {
     if (loginActivity.length === 0) return [];
 
-    const hours = Array.from({ length: 24 }, (_, i) => ({
+    const hours: HourlyDataItem[] = Array.from({ length: 24 }, (_, i) => ({
       hour: i,
       hourLabel: `${String(i).padStart(2, '0')}:00`,
       count: 0,
@@ -105,8 +112,8 @@ export function LoginActivityHeatmap() {
                 fontSize: '12px'
               }}
               cursor={{ fill: '#ffffff05' }}
-              formatter={(value: any) => [`${value} login`, 'Count']}
-              labelFormatter={(label: any) => `Jam: ${label}`}
+              formatter={(value: number) => [`${value} login`, 'Count']}
+              labelFormatter={(label: string) => `Jam: ${label}`}
             />
             <Bar dataKey="count" radius={[4, 4, 0, 0]}>
               {hourlyData.map((entry, index) => (
